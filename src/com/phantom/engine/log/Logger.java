@@ -11,6 +11,14 @@ import java.util.Map;
 
 public class Logger {
 	
+	public static final int LOG_LEVEL_ALL = 0;
+	public static final int LOG_LEVEL_TRACE = 1;
+	public static final int LOG_LEVEL_INFO = 2;
+	public static final int LOG_LEVEL_DEBUG = 3;
+	public static final int LOG_LEVEL_WARNING = 4;
+	public static final int LOG_LEVEL_ERROR = 5;
+	public static final int LOG_LEVEL_FATAL = 6;
+	
 	private static Map<String, Logger> loggers = new HashMap<String, Logger>();
 	private String name;
 	private boolean fileOutput = false;
@@ -19,6 +27,7 @@ public class Logger {
 	private FileWriter writer;
 	private StringBuilder buffer;
 	private List<PrintStream> streams = new ArrayList<PrintStream>();
+	private int logLevel = LOG_LEVEL_ALL;
 	
 	private Logger(String name) {
 		this.name = name;
@@ -50,16 +59,18 @@ public class Logger {
 	}
 	
 	public void trace(Object message) {
+		if (logLevel > LOG_LEVEL_TRACE)
+			return;
 		String msg = "[" + name.toUpperCase() + "] [TRACE] " + message + "\n";
 		if (bufferedPrinting) {
 			buffer.append(msg);
 		} else {
 			for (PrintStream p : streams) {
-				p.print(buffer.toString());
+				p.print(msg);
 			}
 			try {
 				if (fileOutput) {
-					writer.append(msg);
+					writer.append(buffer.toString());
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -68,12 +79,14 @@ public class Logger {
 	}
 	
 	public void debug(Object message) {
+		if (logLevel > LOG_LEVEL_DEBUG)
+			return;
 		String msg = "[" + name.toUpperCase() + "] [DEBUG] " + message + "\n";
 		if (bufferedPrinting) {
 			buffer.append(msg);
 		} else {
 			for (PrintStream p : streams) {
-				p.print(buffer.toString());
+				p.print(msg);
 			}
 			try {
 				if (fileOutput) {
@@ -86,12 +99,14 @@ public class Logger {
 	}
 	
 	public void info(Object message) {
+		if (logLevel > LOG_LEVEL_INFO)
+			return;
 		String msg = "[" + name.toUpperCase() + "] [INFO] " + message + "\n";
 		if (bufferedPrinting) {
 			buffer.append(msg);
 		} else {
 			for (PrintStream p : streams) {
-				p.print(buffer.toString());
+				p.print(msg);
 			}
 			try {
 				writer.append(msg);
@@ -102,12 +117,14 @@ public class Logger {
 	}
 	
 	public void warn(Object message) {
+		if (logLevel > LOG_LEVEL_WARNING)
+			return;
 		String msg = "[" + name.toUpperCase() + "] [WARNING] " + message + "\n";
 		if (bufferedPrinting) {
 			buffer.append(msg);
 		} else {
 			for (PrintStream p : streams) {
-				p.print(buffer.toString());
+				p.print(msg);
 			}
 			try {
 				if (fileOutput) {
@@ -120,12 +137,14 @@ public class Logger {
 	}
 	
 	public void error(Object message) {
+		if (logLevel > LOG_LEVEL_ERROR)
+			return;
 		String msg = "[" + name.toUpperCase() + "] [ERROR] " + message + "\n";
 		if (bufferedPrinting) {
 			buffer.append(msg);
 		} else {
 			for (PrintStream p : streams) {
-				p.print(buffer.toString());
+				p.print(msg);
 			}
 			try {
 				if (fileOutput) {
@@ -138,16 +157,18 @@ public class Logger {
 	}
 	
 	public void fatal(Object message) {
+		if (logLevel > LOG_LEVEL_FATAL)
+			return;
 		String msg = "[" + name.toUpperCase() + "] [FATAL] " + message + "\n";
 		if (bufferedPrinting) {
 			buffer.append(msg);
 		} else {
 			for (PrintStream p : streams) {
-				p.print(buffer.toString());
+				p.print(msg);
 			}
 			try {
 				if (fileOutput) {
-					writer.append(msg);
+					writer.append(buffer.toString());
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -157,15 +178,17 @@ public class Logger {
 	
 	
 	public void print() {
-		for (PrintStream p : streams) {
-			p.print(buffer.toString());
-		}
-		try {
-			if (fileOutput) {
-				writer.append(buffer.toString());
+		if (bufferedPrinting) {
+			for (PrintStream p : streams) {
+				p.print(buffer.toString());
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
+			try {
+				if (fileOutput) {
+					writer.append(buffer.toString());
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	
@@ -203,6 +226,22 @@ public class Logger {
 	
 	public void removePrintStream(PrintStream stream) {
 		streams.remove(stream);
+	}
+
+	public int getLogLevel() {
+		return logLevel;
+	}
+
+	public static int getLogLevelFatal() {
+		return LOG_LEVEL_FATAL;
+	}
+
+	public void setLogLevel(int logLevel) {
+		this.logLevel = logLevel;
+	}
+	
+	public void setFileOutputPath(String path) {
+		output = new File(path);
 	}
 	
 }
