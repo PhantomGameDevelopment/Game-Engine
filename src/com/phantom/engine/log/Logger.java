@@ -28,11 +28,12 @@ public class Logger {
 	private StringBuilder buffer;
 	private List<PrintStream> streams = new ArrayList<PrintStream>();
 	private int logLevel = LOG_LEVEL_ALL;
+	private int line = 1;
 	
 	private Logger(String name) {
 		this.name = name;
-		buffer = new StringBuilder();
 		output = new File("logs/output.log");
+		buffer = new StringBuilder();
 		try {
 			writer = new FileWriter(output.getAbsolutePath());
 		} catch (IOException e) {
@@ -61,7 +62,7 @@ public class Logger {
 	public void trace(Object message) {
 		if (logLevel > LOG_LEVEL_TRACE)
 			return;
-		String msg = "[" + name.toUpperCase() + "] [TRACE] " + message + "\n";
+		String msg = line + " [" + name.toUpperCase() + "] [TRACE] " + message + "\n";
 		if (bufferedPrinting) {
 			buffer.append(msg);
 		} else {
@@ -70,18 +71,19 @@ public class Logger {
 			}
 			try {
 				if (fileOutput) {
-					writer.append(buffer.toString());
+					writer.append(msg);
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
+		line++;
 	}
 	
 	public void debug(Object message) {
 		if (logLevel > LOG_LEVEL_DEBUG)
 			return;
-		String msg = "[" + name.toUpperCase() + "] [DEBUG] " + message + "\n";
+		String msg = line + " [" + name.toUpperCase() + "] [DEBUG] " + message + "\n";
 		if (bufferedPrinting) {
 			buffer.append(msg);
 		} else {
@@ -96,12 +98,13 @@ public class Logger {
 				e.printStackTrace();
 			}
 		}
+		line++;
 	}
 	
 	public void info(Object message) {
 		if (logLevel > LOG_LEVEL_INFO)
 			return;
-		String msg = "[" + name.toUpperCase() + "] [INFO] " + message + "\n";
+		String msg = line + " [" + name.toUpperCase() + "] [INFO] " + message + "\n";
 		if (bufferedPrinting) {
 			buffer.append(msg);
 		} else {
@@ -109,17 +112,20 @@ public class Logger {
 				p.print(msg);
 			}
 			try {
-				writer.append(msg);
+				if (fileOutput) {
+					writer.append(msg);
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
+		line++;
 	}
 	
 	public void warn(Object message) {
 		if (logLevel > LOG_LEVEL_WARNING)
 			return;
-		String msg = "[" + name.toUpperCase() + "] [WARNING] " + message + "\n";
+		String msg = line + " [" + name.toUpperCase() + "] [WARNING] " + message + "\n";
 		if (bufferedPrinting) {
 			buffer.append(msg);
 		} else {
@@ -134,12 +140,13 @@ public class Logger {
 				e.printStackTrace();
 			}
 		}
+		line++;
 	}
 	
 	public void error(Object message) {
 		if (logLevel > LOG_LEVEL_ERROR)
 			return;
-		String msg = "[" + name.toUpperCase() + "] [ERROR] " + message + "\n";
+		String msg = line + " [" + name.toUpperCase() + "] [ERROR] " + message + "\n";
 		if (bufferedPrinting) {
 			buffer.append(msg);
 		} else {
@@ -154,12 +161,13 @@ public class Logger {
 				e.printStackTrace();
 			}
 		}
+		line++;
 	}
 	
 	public void fatal(Object message) {
 		if (logLevel > LOG_LEVEL_FATAL)
 			return;
-		String msg = "[" + name.toUpperCase() + "] [FATAL] " + message + "\n";
+		String msg = line + " [" + name.toUpperCase() + "] [FATAL] " + message + "\n";
 		if (bufferedPrinting) {
 			buffer.append(msg);
 		} else {
@@ -168,12 +176,13 @@ public class Logger {
 			}
 			try {
 				if (fileOutput) {
-					writer.append(buffer.toString());
+					writer.append(msg);
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
+		line++;
 	}
 	
 	
@@ -189,6 +198,7 @@ public class Logger {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+			buffer.setLength(0);
 		}
 	}
 	
@@ -244,4 +254,7 @@ public class Logger {
 		output = new File(path);
 	}
 	
+	public int getLine() {
+		return line;
+	}
 }
