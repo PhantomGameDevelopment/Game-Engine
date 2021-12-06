@@ -3,7 +3,10 @@ package com.phantom.engine.log;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Logger {
@@ -15,13 +18,14 @@ public class Logger {
 	private File output;
 	private FileWriter writer;
 	private StringBuilder buffer;
+	private List<PrintStream> streams = new ArrayList<PrintStream>();
 	
 	private Logger(String name) {
 		this.name = name;
 		buffer = new StringBuilder();
-		output = new File("output.log");
+		output = new File("logs/output.log");
 		try {
-			writer = new FileWriter(output);
+			writer = new FileWriter(output.getAbsolutePath());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -50,7 +54,9 @@ public class Logger {
 		if (bufferedPrinting) {
 			buffer.append(msg);
 		} else {
-			System.out.println(msg);
+			for (PrintStream p : streams) {
+				p.print(buffer.toString());
+			}
 			try {
 				if (fileOutput) {
 					writer.append(msg);
@@ -66,7 +72,9 @@ public class Logger {
 		if (bufferedPrinting) {
 			buffer.append(msg);
 		} else {
-			System.out.println(msg);
+			for (PrintStream p : streams) {
+				p.print(buffer.toString());
+			}
 			try {
 				if (fileOutput) {
 					writer.append(msg);
@@ -82,7 +90,9 @@ public class Logger {
 		if (bufferedPrinting) {
 			buffer.append(msg);
 		} else {
-			System.out.println(msg);
+			for (PrintStream p : streams) {
+				p.print(buffer.toString());
+			}
 			try {
 				writer.append(msg);
 			} catch (IOException e) {
@@ -96,7 +106,9 @@ public class Logger {
 		if (bufferedPrinting) {
 			buffer.append(msg);
 		} else {
-			System.out.println(msg);
+			for (PrintStream p : streams) {
+				p.print(buffer.toString());
+			}
 			try {
 				if (fileOutput) {
 					writer.append(msg);
@@ -112,7 +124,9 @@ public class Logger {
 		if (bufferedPrinting) {
 			buffer.append(msg);
 		} else {
-			System.out.println(msg);
+			for (PrintStream p : streams) {
+				p.print(buffer.toString());
+			}
 			try {
 				if (fileOutput) {
 					writer.append(msg);
@@ -128,7 +142,9 @@ public class Logger {
 		if (bufferedPrinting) {
 			buffer.append(msg);
 		} else {
-			System.out.println(msg);
+			for (PrintStream p : streams) {
+				p.print(buffer.toString());
+			}
 			try {
 				if (fileOutput) {
 					writer.append(msg);
@@ -141,7 +157,9 @@ public class Logger {
 	
 	
 	public void print() {
-		System.out.print(buffer.toString());
+		for (PrintStream p : streams) {
+			p.print(buffer.toString());
+		}
 		try {
 			if (fileOutput) {
 				writer.append(buffer.toString());
@@ -150,8 +168,20 @@ public class Logger {
 			e.printStackTrace();
 		}
 	}
+	
+	public void close() {
+		try {
+			writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public boolean isBufferEmpty() {
+		return buffer.isEmpty();
+	}
 
-	public boolean isFileOutput() {
+	public boolean doFileOutput() {
 		return fileOutput;
 	}
 
@@ -159,12 +189,20 @@ public class Logger {
 		this.fileOutput = fileOutput;
 	}
 
-	public boolean isBufferedPrinting() {
+	public boolean doBufferedPrinting() {
 		return bufferedPrinting;
 	}
 
 	public void setBufferedPrinting(boolean bufferedPrinting) {
 		this.bufferedPrinting = bufferedPrinting;
+	}
+	
+	public void addPrintStream(PrintStream stream) {
+		streams.add(stream);
+	}
+	
+	public void removePrintStream(PrintStream stream) {
+		streams.remove(stream);
 	}
 	
 }

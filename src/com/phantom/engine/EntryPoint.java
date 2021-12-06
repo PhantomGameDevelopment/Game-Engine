@@ -6,11 +6,15 @@ public class EntryPoint {
 
 	public static void main(String[] args) {
 		Logger core = Logger.init("core");
+		core.addPrintStream(System.out);
 		core.setBufferedPrinting(true);
 		core.setFileOutput(true);
 		
 		core.trace("Hello World!");
-		core.print();
+		if (!core.isBufferEmpty()) {
+			core.print();
+		}
+		core.close();
 	}
 	
 }
